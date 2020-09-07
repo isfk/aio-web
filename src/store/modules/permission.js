@@ -10,7 +10,9 @@ const componentMap = {
   layout: () => import('@/layout'),
   dashboard: () => import('@/views/dashboard/index'),
   user_list: () => import('@/views/user/list'),
-  role_list: () => import('@/views/role/list')
+  role_list: () => import('@/views/role/list'),
+  article_list: () => import('@/views/article/list'),
+  category_list: () => import('@/views/article/list')
 }
 
 const mutations = {
@@ -34,15 +36,12 @@ const actions = {
 
             for (const key in data) {
               const ele = data[key]
-              data[key]['component'] =
-                                componentMap[ele['component']]
+              data[key]['component'] = componentMap[ele['component']]
 
-              if (ele['children'] != null &&
-                                ele['children'].length > 0) {
+              if (ele['children'] != null && ele['children'].length > 0) {
                 for (const k in ele['children']) {
                   const e = ele['children'][k]
-                  data[key]['children'][k]['component'] =
-                                        componentMap[e['component']]
+                  data[key]['children'][k]['component'] = componentMap[e['component']]
                 }
               }
             }
