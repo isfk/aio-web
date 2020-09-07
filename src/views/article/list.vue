@@ -27,7 +27,7 @@
       </el-select>
 
       <el-select
-        v-model="listQuery.category"
+        v-model="listQuery.category_id"
         placeholder="分类"
         clearable
         class="filter-item"
@@ -117,6 +117,10 @@
           <el-input v-model="formData.title" />
         </el-form-item>
 
+        <el-form-item label="内容" prop="content">
+          <tinymce v-model="formData.content" :height="300" />
+        </el-form-item>
+
         <el-form-item label="分类" prop="status">
           <el-select v-model="formData.category_id" placeholder="请选择" class="filter-item">
             <el-option
@@ -149,18 +153,18 @@
 
 <script>
 import Pagination from '@/components/Pagination'
+import Tinymce from '@/components/Tinymce'
 import dayjs from 'dayjs'
 
 const statusList = [1, -1]
 
 const statusSearchOptions = [
-  { value: '0', label: '全部' },
   { value: '1', label: '正常' },
   { value: '-1', label: '已删除' }
 ]
 
 export default {
-  components: { Pagination },
+  components: { Pagination, Tinymce },
   filters: {
     statusColorFilter(status) {
       const statusMap = {
@@ -207,6 +211,7 @@ export default {
         id: undefined,
         title: '',
         content: '',
+        category_id: 0,
         status: 1
       },
       formRules: {
@@ -232,8 +237,8 @@ export default {
   },
 
   created() {
-    this.getCategoryList()
     this.fetchData()
+    this.getCategoryList()
   },
 
   methods: {
@@ -241,17 +246,21 @@ export default {
       this.$store
         .dispatch('article/getCategoryList')
         .then(response => {
-          this.categoryList = response.list
+          if (response.count > 0) {
+            this.categoryList = response.list
+          }
         })
         .catch(() => {
         })
     },
     fetchData() {
       this.listLoading = true
+      this.list = null
+      this.total = 0
       this.$store
         .dispatch('article/getList', this.listQuery)
         .then(response => {
-          if (response.list > 0) {
+          if (response.count > 0) {
             this.list = response.list
             this.total = response.count
           }
@@ -267,12 +276,11 @@ export default {
     },
 
     resetFormData() {
-      this.formData = {
-        id: undefined,
-        title: '',
-        content: '',
-        status: 1
-      }
+      this.formData.id = undefined
+      this.formData.title = ''
+      this.formData.content =
+      this.formData.category_id = 0
+      this.formData.status = 1
     },
 
     // 添加
